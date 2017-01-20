@@ -1,1 +1,212 @@
-STUB
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>When will America be 'Great Again'?</title>
+    <meta name="description" content="Webpage for xxxx">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="flipclock.css" rel="stylesheet">
+
+    <!-- happily lifted from http://mrmrs.io/links/ -->
+    <style>
+        a {
+        transition: color .4s;
+        color: #265C83;
+        }
+
+        a:link,
+        a:visited { color: #265C83; }
+        a:hover   { color: #7FDBFF; }
+        a:active  {
+        transition: color .3s;
+        color: #007BE6;
+        }
+
+        a { text-decoration: none; }
+    </style>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .header {
+            width: 100%;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .header h1 { font-size: 4em; }
+        .header h2 { font-size: 2em; margin-top: 100px; }
+
+        .footer {
+            width: 100%;
+            text-align: center;
+            margin-top: 100px;
+        }
+        
+        .footer h1 { font-size: 4em; }
+        .footer h1.cta { font-size: 4.1em; margin-top: 30px; }
+        .footer h2 { font-size: 3em; margin-top: 30px; }
+
+
+        .clock-wrapper {
+            margin-top: 50px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .clock-wrapper .clock {
+            margin: 0 auto;
+            width: 780px;
+        }
+        .flip-clock-label {
+            right: -94px !important;
+            font-size: 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .sig {
+            margin-top: 50px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>When will America be Great Again?</h1>
+        <h2 class="time"></h2>
+    </div>
+    <div class="clock-wrapper">
+        <div class="clock"></div>
+    </div>
+    <div class="footer">
+        <h1>Can't wait that long?</h1>
+        <h1 class="cta"><a href="http://www.whoismyrepresentative.com/">Contact your representatives in Congress</a></h1>
+        <h2>and let them know how you feel.</h2>
+    </div>
+    <div class="sig">Made with ❤ by Rick Button</div>
+</body>
+<!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="flipclock.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.11/moment-timezone-with-data.min.js"></script>
+<script>
+// Lifted with pleasure from: 
+// https://stackoverflow.com/questions/36229399/add-year-counter-to-flipclock-js 
+(function($) {
+    var getYears = function(c) { return Math.floor(c.time / 60 / 60 / 24 / 7 / 52); };
+
+
+    var getYearCounter = function(c, includeSeconds) {
+        var digits = [
+            getYears(c),
+            c.getDays(true),
+            c.getHours(true),
+            c.getMinutes(true)
+        ];
+
+        if(includeSeconds) {
+            digits.push(c.getSeconds(true));
+        }
+
+        return c.digitize(digits);   
+    };
+
+    /**
+     * Yearly Counter Clock Face
+     *
+     * This class will generate a yearly counter for FlipClock.js. A
+     * yearly counter will track years, days, hours, minutes, and seconds. If
+     * the number of available digits is exceeded in the count, a new
+     * digit will be created.
+     *
+     * @param  object  The parent FlipClock.Factory object
+     * @param  object  An object of properties to override the default
+     */
+
+    FlipClock.YearlyCounterFace = FlipClock.Face.extend({
+
+        showSeconds: true,
+
+        /**
+         * Constructor
+         *
+         * @param  object  The parent FlipClock.Factory object
+         * @param  object  An object of properties to override the default
+         */
+
+        constructor: function(factory, options) {
+            this.base(factory, options);
+        },
+
+        /**
+         * Build the clock face
+         */
+
+        build: function(time) {
+            var t = this;
+            var children = this.factory.$el.find('ul');
+            var offset = 0;
+
+            time = time ? time : getYearCounter(this.factory.time, this.showSeconds);
+
+            if(time.length > children.length) {
+                $.each(time, function(i, digit) {
+                    t.createList(digit);
+                });
+            }
+
+            if(this.showSeconds) {
+                $(this.createDivider('Seconds')).insertBefore(this.lists[this.lists.length - 2].$el);
+            }
+            else
+            {
+                offset = 2;
+            }
+
+            $(this.createDivider('Minutes')).insertBefore(this.lists[this.lists.length - 4 + offset].$el);
+            $(this.createDivider('Hours')).insertBefore(this.lists[this.lists.length - 6 + offset].$el);
+            $(this.createDivider('Days')).insertBefore(this.lists[this.lists.length - 8 + offset].$el);
+            $(this.createDivider('Years', true)).insertBefore(this.lists[0].$el);
+
+            this.base();
+        },
+
+        /**
+         * Flip the clock face
+         */
+
+        flip: function(time, doNotAddPlayClass) {
+            if(!time) {
+                time = getYearCounter(this.factory.time, this.showSeconds);
+            }
+
+            this.autoIncrement();
+
+            this.base(time, doNotAddPlayClass);
+        }
+
+    });
+
+}(jQuery));
+</script>
+<script>
+    var sadTime = moment();
+    var noTrumpTime = moment("2021-01-20 12:00-05:00")
+    var secsToNoTrump = noTrumpTime.unix() - sadTime.unix();
+
+    $(".time").html(noTrumpTime.tz("America/New_York").format("MMMM Do, YYYY [at] h:mma z"))
+    var clock = new $(".clock").FlipClock(secsToNoTrump, {
+        clockFace: 'YearlyCounter',
+        countdown: true
+    });
+</script>
+
+</html>
